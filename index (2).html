@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Climate Mobility Framework - Classification Logic Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-dark: #2d3436;
+            --primary-grey: #636e72;
+            --secondary-grey: #b2bec3;
+            --light-grey: #dfe6e9;
+            --bg-grey: #f8f9fa;
+            --white: #ffffff;
+            --accent-terracotta: #8b6f47;
+            --accent-slate: #7a9299;
+            --accent-olive: #6b7862;
+            --border-color: #cbd5e0;
+        }
+
+        body {
+            font-family: 'Aptos', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-grey);
+            color: var(--primary-dark);
+            line-height: 1.6;
+            font-size: 10pt;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--white);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            background: var(--primary-dark);
+            color: var(--white);
+            padding: 30px 40px;
+            border-bottom: 3px solid var(--accent-terracotta);
+        }
+
+        .header h1 {
+            font-size: 20pt;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+
+        .header .subtitle {
+            font-size: 10pt;
+            color: var(--secondary-grey);
+            font-weight: 400;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--light-grey);
+        }
+
+        .section-number {
+            background: var(--accent-terracotta);
+            color: var(--white);
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12pt;
+            font-weight: 600;
+        }
+
+        .section-title {
+            font-size: 14pt;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        h3 {
+            font-size: 11pt;
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin: 20px 0 12px 0;
+        }
+
+        h4 {
+            font-size: 10pt;
+            font-weight: 600;
+            color: var(--primary-grey);
+            margin: 16px 0 8px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 9pt;
+        }
+
+        p {
+            margin-bottom: 10px;
+            text-align: justify;
+        }
+
+        .info-box {
+            background: var(--bg-grey);
+            border-left: 3px solid var(--accent-slate);
+            padding: 16px 20px;
+            margin: 16px 0;
+        }
+
+        .info-box.critical {
+            border-left-color: var(--accent-terracotta);
+            background: #fef5f1;
+        }
+
+        .info-box p {
+            margin-bottom: 8px;
+            font-size: 9.5pt;
+        }
+
+        .info-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: var(--primary-dark);
+            font-size: 9pt;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin: 16px 0;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin: 16px 0;
+        }
+
+        .card {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            padding: 16px;
+        }
+
+        .card-header {
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 8px;
+            font-size: 10pt;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--light-grey);
+        }
+
+        .card-content {
+            font-size: 9.5pt;
+            color: var(--primary-grey);
+        }
+
+        .state-card {
+            border: 1px solid var(--border-color);
+            margin: 20px 0;
+            background: var(--white);
+        }
+
+        .state-card-header {
+            background: var(--primary-dark);
+            color: var(--white);
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .state-name {
+            font-size: 11pt;
+            font-weight: 600;
+        }
+
+        .state-category {
+            font-size: 8.5pt;
+            padding: 3px 10px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 2px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .state-body {
+            padding: 16px;
+        }
+
+        .state-section {
+            margin-bottom: 16px;
+        }
+
+        .state-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .indicator-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .indicator-item {
+            background: var(--bg-grey);
+            padding: 10px 12px;
+            border-left: 2px solid var(--accent-slate);
+            font-size: 9pt;
+        }
+
+        .indicator-name {
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .threshold {
+            color: var(--accent-terracotta);
+            font-weight: 600;
+        }
+
+        .logic-box {
+            background: var(--bg-grey);
+            border: 1px solid var(--border-color);
+            padding: 12px 16px;
+            margin: 12px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 9pt;
+            color: var(--primary-grey);
+        }
+
+        .overlap-box {
+            background: #fffbf0;
+            border: 1px solid #f0c674;
+            padding: 12px 16px;
+            margin: 12px 0;
+        }
+
+        .overlap-title {
+            font-weight: 600;
+            color: #8b6914;
+            font-size: 9.5pt;
+            margin-bottom: 8px;
+        }
+
+        ul, ol {
+            margin-left: 20px;
+            margin-bottom: 10px;
+        }
+
+        li {
+            margin-bottom: 6px;
+            font-size: 9.5pt;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 9pt;
+        }
+
+        th {
+            background: var(--primary-dark);
+            color: var(--white);
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 9pt;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            vertical-align: top;
+        }
+
+        tr:nth-child(even) {
+            background: var(--bg-grey);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            font-size: 8pt;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-left: 6px;
+        }
+
+        .badge-anchor {
+            background: #e8f4f8;
+            color: var(--accent-slate);
+        }
+
+        .badge-signal {
+            background: #fef5f1;
+            color: var(--accent-terracotta);
+        }
+
+        .badge-trigger {
+            background: #f5f5f5;
+            color: var(--accent-olive);
+        }
+
+        .badge-gate {
+            background: #f0f0f0;
+            color: var(--primary-grey);
+        }
+
+        .step-container {
+            margin: 24px 0;
+        }
+
+        .step {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            margin-bottom: 16px;
+            padding: 16px 20px;
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .step-number {
+            background: var(--accent-slate);
+            color: var(--white);
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10pt;
+            font-weight: 600;
+        }
+
+        .step-title {
+            font-size: 11pt;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .step-content {
+            font-size: 9.5pt;
+            color: var(--primary-grey);
+            padding-left: 40px;
+        }
+
+        .key-principle {
+            background: #f8f9fa;
+            border-left: 3px solid var(--accent-terracotta);
+            padding: 12px 16px;
+            margin: 12px 0;
+            font-size: 9.5pt;
+        }
+
+        .key-principle strong {
+            color: var(--accent-terracotta);
+        }
+
+        @media print {
+            body { background: white; }
+            .container { box-shadow: none; }
+            .section { page-break-inside: avoid; }
+        }
+
+        @media (max-width: 1024px) {
+            .grid-2, .grid-3, .indicator-grid {
+                grid-template-columns: 1fr;
+            }
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Climate Mobility Framework</h1>
+            <div class="subtitle">Classification Logic, Decision Trees, and Critical Indicators Guide</div>
+        </div>
+
+        <div class="content">
+            <!-- Introduction -->
+            <div class="info-box critical">
+                <div class="info-label">Document Purpose</div>
+                <p>This guide provides the complete classification methodology for the Climate Mobility Framework (CMF), documenting the step-by-step process for classifying households and settlements into 15 distinct mobility states based on 18 indicators across 4 pillars.</p>
+                <p><strong>Intended Users:</strong> Researchers, policymakers, practitioners, and field teams conducting climate mobility assessments.</p>
+            </div>
+
+            <!-- Section 1: Classification Process -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-number">1</div>
+                    <div class="section-title">THE 5-STEP CLASSIFICATION PROCESS</div>
+                </div>
+
+                <div class="key-principle">
+                    <strong>CRITICAL PRINCIPLE:</strong> Classification is not purely algorithmic. While quantitative thresholds guide the process, qualitative assessment and contextual understanding are essential, especially in transitional or overlapping cases. The framework prioritizes diagnostic accuracy over mechanical scoring.
+                </div>
+
+                <div class="step-container">
+                    <div class="step">
+                        <div class="step-header">
+                            <div class="step-number">1</div>
+                            <div class="step-title">Assess All 18 Indicators</div>
+                        </div>
+                        <div class="step-content">
+                            <p>Score each indicator on a 1-5 scale based on detailed rubrics covering four pillars:</p>
+                            <ul>
+                                <li><strong>Pillar A (Physical Infrastructure):</strong> Tenure Security, Housing Quality, Infrastructure Access, Utilities, Service Access</li>
+                                <li><strong>Pillar B (Economic Factors):</strong> Livelihood Stability, Economic Opportunities, Financial Resources, Self-Investment</li>
+                                <li><strong>Pillar C (Environmental Exposure):</strong> Environmental Risk, Hazard Frequency, Resource Depletion, Ecosystem Health, Adaptive Capacity</li>
+                                <li><strong>Pillar D (Institutional Support):</strong> Social Networks, Community Cohesion, State Assistance, Regulatory Access</li>
+                            </ul>
+                            <p><strong>Key Principle:</strong> Use the full range of scores (1-5). Extreme scores (1-2, 4-5) are often the most diagnostic.</p>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-header">
+                            <div class="step-number">2</div>
+                            <div class="step-title">Calculate Pillar Averages</div>
+                        </div>
+                        <div class="step-content">
+                            <p>Compute the arithmetic mean for each pillar and interpret using threshold ranges:</p>
+                            <ul>
+                                <li>&lt;2.0 = Critical/Severe constraint</li>
+                                <li>2.0-2.9 = Significant challenges</li>
+                                <li>3.0-3.4 = Moderate/Mixed conditions</li>
+                                <li>3.5-4.0 = Fair/Generally functional</li>
+                                <li>&gt;4.0 = Good/Strong capacity</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-header">
+                            <div class="step-number">3</div>
+                            <div class="step-title">Identify Critical Indicator Patterns</div>
+                        </div>
+                        <div class="step-content">
+                            <p>Four indicators have special diagnostic significance:</p>
+                            <div class="grid-2" style="margin-top: 12px;">
+                                <div class="card">
+                                    <div class="card-header">#1 Tenure Security <span class="badge badge-anchor">ANCHOR</span></div>
+                                    <div class="card-content">Foundation for all investment decisions. Without secure tenure (≤2), households won't invest regardless of other conditions.</div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-header">#9 Self-Investment <span class="badge badge-signal">SIGNAL</span></div>
+                                    <div class="card-content">Primary commitment signal. Low scores (≤2) indicate mobility readiness; high scores (≥4) indicate settlement commitment.</div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-header">#10 Environmental Risk <span class="badge badge-trigger">TRIGGER</span></div>
+                                    <div class="card-content">Crisis trigger. Extreme risk (≤2) can force mobility even with high investment; low risk (≥4) enables stability.</div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-header">#18 Regulatory Access <span class="badge badge-gate">GATE</span></div>
+                                    <div class="card-content">Access gate to formal systems. Without this (≤2), households locked out of programs, credit, legal recourse.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-header">
+                            <div class="step-number">4</div>
+                            <div class="step-title">Match Pattern to Classification State</div>
+                        </div>
+                        <div class="step-content">
+                            <p>Follow the decision tree logic to identify the primary classification. The process typically follows this hierarchy:</p>
+                            <ol>
+                                <li>Check for extreme environmental exposure + low investment → Active Mobility States (A1-A3)</li>
+                                <li>Check for high investment → Immobility States (B1-B4)</li>
+                                <li>Check for environmental/economic drivers without investment → Active Mobility States (A4-A8)</li>
+                                <li>Check for mid-range scores across dimensions → Transitional States (C1-C3)</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-header">
+                            <div class="step-number">5</div>
+                            <div class="step-title">Diagnose Root Causes and Binding Constraints</div>
+                        </div>
+                        <div class="step-content">
+                            <p>After classification, analyze:</p>
+                            <ul>
+                                <li><strong>Binding Constraints:</strong> Indicators scoring ≤2 that are blocking positive outcomes</li>
+                                <li><strong>Critical Indicators:</strong> How the four key indicators explain the classification</li>
+                                <li><strong>Contributing Factors:</strong> Other indicators reinforcing the primary pattern</li>
+                                <li><strong>Alternative Classifications:</strong> Other plausible states given indicator variance</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2: Detailed Classifications -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-number">2</div>
+                    <div class="section-title">DETAILED STATE CLASSIFICATIONS</div>
+                </div>
+
+                <div class="info-box">
+                    <p><strong>Organization:</strong> The 15 mobility states are organized into three categories:</p>
+                    <ul>
+                        <li><strong>Category A: Active Mobility (8 states)</strong> - Households that are mobile, preparing to move, or recently displaced</li>
+                        <li><strong>Category B: Immobility (4 states)</strong> - Households that are settled and not mobile</li>
+                        <li><strong>Category C: Transitional (3 states)</strong> - Households in unstable equilibrium that will tip toward mobility or immobility</li>
+                    </ul>
+                </div>
+
+                <h3>Category A: Active Mobility States</h3>
+
+                <!-- A1: Distress Migration -->
+                <div class="state-card">
+                    <div class="state-card-header">
+                        <div class="state-name">A1: Distress Migration</div>
+                        <div class="state-category">Active Mobility</div>
+                    </div>
+                    <div class="state-body">
+                        <div class="state-section">
+                            <h4>Critical Indicator Thresholds</h4>
+                            <div class="indicator-grid">
+                                <div class="indicator-item">
+                                    <span class="indicator-name">#9 Self-Investment:</span> <span class="threshold">≤ 2</span>
+                                    <div style="font-size: 8.5pt; margin-top: 4px; color: #636e72;">Low investment despite having been present</div>
+                                </div>
+                                <div class="indicator-item">
+                                    <span class="indicator-name">#10 Environmental Risk:</span> <span class="threshold">≤ 2</span>
+                                    <div style="font-size: 8.5pt; margin-top: 4px; color: #636e72;">Extreme or high environmental threat</div>
+                                </div>
+                                <div class="indicator-item">
+                                    <span class="indicator-name">#1 Tenure Security:</span> <span class="threshold">≥ 3</span>
+                                    <div style="font-size: 8.5pt; margin-top: 4px; color: #636e72;">Has achieved some documentation</div>
+                                </div>
+                                <div class="indicator-item">
+                                    <span class="indicator-name">#18 Regulatory Access:</span> <span class="threshold">≥ 3</span>
+                                    <div style="font-size: 8.5pt; margin-top: 4px; color: #636e72;">Can access formal systems</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="state-section">
+                            <h4>Classification Logic</h4>
+                            <div class="logic-box">
+IF (Self-Investment ≤ 2) AND (Environmental Risk ≤ 2)
+AND (Tenure Security ≥ 3) AND (Regulatory Access ≥ 3)
+THEN → A1: Distress Migration
+                            </div>
+                            <p>The paradox of low investment DESPITE having secure tenure and regulatory access signals that environmental threat is driving the mobility decision. This is a CRITICAL INTERVENTION WINDOW - household has documentation needed for planned relocation but environmental pressure is forcing premature departure.</p>
+                        </div>
+
+                        <div class="state-section">
+                            <h4>Distinguishing Features</h4>
+                            <ul>
+                                <li>Unlike A3 (Crisis-Induced Displacement), A1 households have formal documentation</li>
+                                <li>Unlike A6 (Preventive Migration), investment is minimal rather than moderate</li>
+                                <li>Unlike B2 (Risky Persistence), low investment shows recognition that staying is untenable</li>
+                            </ul>
+                        </div>
+
+                        <div class="overlap-box">
+                            <div class="overlap-title">Potential Overlaps & Edge Cases</div>
+                            <p><strong>→ A3 (Crisis-Induced Displacement):</strong> If tenure (score ~3) or regulatory access (score ~3) are marginally achieved and functionally weaker than documented</p>
+                            <p><strong>→ C2 (Consolidation Phase):</strong> If environmental risk is episodic (score fluctuates 2-3) rather than chronic; household might stabilize between events</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- A2: Trapped Population -->
+                <div class="state-card">
+                    <div class="state-card-header">
+                        <div class="state-name">A2: Trapped Population</div>
+                        <div class="state-category">Active Mobility - CRITICAL</div>
+                    </div>
+                    <div class="state-body">
+                        <div class="state-section">
+                            <h4>Critical Indicator Thresholds</h4>
+                            <div class="indicator-grid">
+                                <div class="indicator-item">
+                                    <span class="indicator-name">#9 Self-Investment:</span> <span class="threshold">≤ 2</span>
+                                    <div style="font-size: 8.5pt; margin-top: 4px; color: #636e72;">Minimal investment recognizing futility</div>
+                                </div>
+                                <div class="indicator-item">
+                                    <span class="indicator-name">#10 Environmental Risk:</span> <span class="threshold">≤ 2</span>
+                                    <div style="font-size: 8.5pt; margin-top: 4px; color: #636e72;">Extreme existential environmental threat</div>
+                                </div>
+                                <div class="indicator-item" style="grid-column: 1 / -1;">
+                                    <span class="indicator-name">#8 Financial Resources:</span> <span class="threshold">= 1</span>
+                                    <div style="font-size: 8.5pt; margin-top: 4px; color: #636e72;">Zero savings/assets - THE binding constraint</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="state-section">
+                            <h4>Classification Logic</h4>
+                            <div class="logic-box">
+IF (Self-Investment ≤ 2) AND (Environmental Risk ≤ 2)
+AND (Financial Resources = 1)
+THEN → A2: Trapped Population
+                            </div>
+                            <p>This is the MOST CRITICAL state - household faces extreme environmental risk but has ZERO financial capacity to relocate. They cannot afford to adapt in place (no investment resources) OR move to safety (no migration resources). This is the definition of "trapped populations" - facing imminent threat but locked in place by poverty. Requires immediate emergency intervention.</p>
+                        </div>
+
+                        <div class="state-section">
+                            <h4>Distinguishing Features</h4>
+                            <ul>
+                                <li>Zero financial resources (score = 1) is the critical distinguisher from A1 and A3</li>
+                                <li>Unlike A1: Has zero financial resources vs. A1 which has some capacity</li>
+                                <li>Unlike B3: B3 has invested despite constraints; A2 cannot invest at all</li>
+                            </ul>
+                        </div>
+
+                        <div class="info-box critical">
+                            <div class="info-label">Critical Warning</div>
+                            <p>A2 is the highest priority for intervention. Without external support, these households face catastrophic outcomes - they will remain until forced displacement under worst possible conditions (injury, death, complete asset loss). Standard relocation programs requiring household contributions are inaccessible to A2 households.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 3: Overlap Analysis -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-number">3</div>
+                    <div class="section-title">SYSTEMATIC OVERLAP ANALYSIS</div>
+                </div>
+
+                <div class="key-principle">
+                    <strong>UNDERSTANDING OVERLAPS:</strong> Overlaps between mobility states are not errors or ambiguities in the framework - they reflect real-world complexity where households exhibit characteristics of multiple states simultaneously or are in transition between states.
+                </div>
+
+                <h3>Major Overlap Zones</h3>
+
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header">Environmental Crisis Cluster (A1/A2/A3)</div>
+                        <div class="card-content">
+                            <p><strong>Common Ground:</strong> All three share extreme environmental risk (≤2) + low investment (≤2)</p>
+                            <p><strong>Distinguishing Dimensions:</strong></p>
+                            <ul style="margin-top: 6px;">
+                                <li>Financial Capacity: A2 (zero) vs. A1/A3 (some)</li>
+                                <li>Formal Access: A1 (has) vs. A3 (lacks) vs. A2 (irrelevant)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Economic Mobility Cluster (A4/A5)</div>
+                        <div class="card-content">
+                            <p><strong>Common Ground:</strong> Low investment (≤2) + safe environment (≥4)</p>
+                            <p><strong>Distinguishing Dimension:</strong></p>
+                            <ul style="margin-top: 6px;">
+                                <li>Economic standing: A4 (Pillar B ≤2.0) vs. A5 (Pillar B >2.0)</li>
+                                <li>Desperation vs. choice-driven mobility</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Vulnerable Immobility Cluster (B2/B3)</div>
+                        <div class="card-content">
+                            <p><strong>Common Ground:</strong> High investment (≥4) creating immobility despite vulnerabilities</p>
+                            <p><strong>Distinguishing Dimensions:</strong></p>
+                            <ul style="margin-top: 6px;">
+                                <li>B2: Environmental risk + capacity to leave but chooses to stay</li>
+                                <li>B3: Multiple constraints + trapped by sunk costs</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Transitional Cluster (C1/C2/C3)</div>
+                        <div class="card-content">
+                            <p><strong>Common Ground:</strong> Mid-range tenure (2-3) + mid-range investment (2-3)</p>
+                            <p><strong>Distinguishing Dimensions:</strong></p>
+                            <ul style="margin-top: 6px;">
+                                <li>C1: Favorable environment (≥4) - positive trajectory</li>
+                                <li>C2: Environmental stress (≤2) - critical window</li>
+                                <li>C3: Balanced scores - ambiguous direction</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 4: Confidence Scoring -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-number">4</div>
+                    <div class="section-title">CONFIDENCE SCORING METHODOLOGY</div>
+                </div>
+
+                <p>Every classification should be assigned a confidence score (0-100%) indicating how clearly the indicator pattern matches the assigned state.</p>
+
+                <h3>Base Confidence Assignment</h3>
+
+                <div class="grid-3">
+                    <div class="card">
+                        <div class="card-header">80% Base</div>
+                        <div class="card-content">Pattern matches decision tree clearly with all critical indicators solidly meeting thresholds (e.g., scores of 1 when threshold is ≤2)</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">65% Base</div>
+                        <div class="card-content">Pattern matches but some critical indicators are borderline (within 0.5 points of threshold)</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">50% Base</div>
+                        <div class="card-content">Pattern is ambiguous, requiring assumptions about unmeasured factors or interpretation of contradictory indicators</div>
+                    </div>
+                </div>
+
+                <h3>Confidence Adjustments</h3>
+
+                <div class="info-box">
+                    <p><strong>Increase confidence (+5 to +15%):</strong> Multiple critical indicators strongly align, pillar averages reinforce classification, no significant contradictory indicators, supporting qualitative evidence corroborates</p>
+                </div>
+
+                <div class="info-box">
+                    <p><strong>Decrease confidence (-5 to -20%):</strong> Critical indicators at exact thresholds, mixed signals across dimensions, multiple plausible alternative classifications, pillar averages don't support primary classification</p>
+                </div>
+
+                <h3>Interpretation Guidelines</h3>
+
+                <table>
+                    <tr>
+                        <th style="width: 20%;">Confidence Range</th>
+                        <th>Interpretation</th>
+                    </tr>
+                    <tr>
+                        <td>85-100%</td>
+                        <td>High confidence - Clear classification, minimal alternative explanations</td>
+                    </tr>
+                    <tr>
+                        <td>70-84%</td>
+                        <td>Good confidence - Strong primary classification with minor alternatives</td>
+                    </tr>
+                    <tr>
+                        <td>55-69%</td>
+                        <td>Moderate confidence - Primary classification likely but alternatives viable</td>
+                    </tr>
+                    <tr>
+                        <td>40-54%</td>
+                        <td>Low confidence - Multiple interpretations equally plausible, requires qualitative investigation</td>
+                    </tr>
+                    <tr>
+                        <td>&lt;40%</td>
+                        <td>Very low confidence - Classification is best guess, high uncertainty</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Section 5: Summary Table -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-number">5</div>
+                    <div class="section-title">QUICK REFERENCE TABLE</div>
+                </div>
+
+                <table>
+                    <tr>
+                        <th style="width: 12%;">State</th>
+                        <th style="width: 22%;">Critical Indicators</th>
+                        <th style="width: 28%;">Primary Logic</th>
+                        <th style="width: 18%;">Main Overlaps</th>
+                        <th style="width: 20%;">Key Distinguisher</th>
+                    </tr>
+                    <tr>
+                        <td><strong>A1</strong> Distress Migration</td>
+                        <td>#9≤2, #10≤2, #1≥3, #18≥3</td>
+                        <td>Environmental crisis + low investment DESPITE formal access</td>
+                        <td>A3, C2</td>
+                        <td>Has documentation unlike A3</td>
+                    </tr>
+                    <tr>
+                        <td><strong>A2</strong> Trapped</td>
+                        <td>#9≤2, #10≤2, #8=1</td>
+                        <td>Environmental crisis + zero mobility capacity</td>
+                        <td>A3, B3</td>
+                        <td>Zero financial resources</td>
+                    </tr>
+                    <tr>
+                        <td><strong>A3</strong> Crisis Displacement</td>
+                        <td>#9≤2, #10≤2, #1≤2, #18≤2</td>
+                        <td>Environmental crisis + no formal access</td>
+                        <td>A1, A2, A7</td>
+                        <td>Lacks both tenure & regulatory</td>
+                    </tr>
+                    <tr>
+                        <td><strong>A4</strong> Economic Migration</td>
+                        <td>#9≤2, #10≥4, PillarB≤2.0</td>
+                        <td>Safe place + poor economics + low investment</td>
+                        <td>A5, C1</td>
+                        <td>Economic desperation (PillarB≤2)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>A5</strong> Voluntary Relocation</td>
+                        <td>#9≤2, #10≥4, PillarB>2.0</td>
+                        <td>Safe place + adequate economics + low investment</td>
+                        <td>A4, B4, C1</td>
+                        <td>Choice not desperation</td>
+                    </tr>
+                    <tr>
+                        <td><strong>A6</strong> Preventive Migration</td>
+                        <td>#9≥3, #10≤2</td>
+                        <td>Moderate investment DESPITE environmental risk</td>
+                        <td>B2, C2</td>
+                        <td>Moderate (not high) investment</td>
+                    </tr>
+                    <tr>
+                        <td><strong>A7</strong> Irregular Settlement</td>
+                        <td>#1≤2, #18≤2</td>
+                        <td>BOTH tenure AND regulatory blocked</td>
+                        <td>A3, C1</td>
+                        <td>Both formal access indicators low</td>
+                    </tr>
+                    <tr>
+                        <td><strong>A8</strong> Livelihood Mobility</td>
+                        <td>PillarA≥3.5, PillarB≤2.5</td>
+                        <td>Good infrastructure + poor economics</td>
+                        <td>A4, B1</td>
+                        <td>Structural mismatch pattern</td>
+                    </tr>
+                    <tr>
+                        <td><strong>B1</strong> Established</td>
+                        <td>#9≥4, #1≥4, PillarA≥3.5</td>
+                        <td>High investment + strong tenure + good infrastructure</td>
+                        <td>B2, C1</td>
+                        <td>All three thresholds met</td>
+                    </tr>
+                    <tr>
+                        <td><strong>B2</strong> Risky Persistence</td>
+                        <td>#9≥4, #10≤2, #8≥3</td>
+                        <td>High investment DESPITE risk + capacity to leave</td>
+                        <td>B1, B3, A6</td>
+                        <td>Has financial capacity to relocate</td>
+                    </tr>
+                    <tr>
+                        <td><strong>B3</strong> Constrained Immobile</td>
+                        <td>#9≥4 + vulnerabilities</td>
+                        <td>High investment due to lack of alternatives</td>
+                        <td>B2, A2</td>
+                        <td>Trapped by sunk costs not choice</td>
+                    </tr>
+                    <tr>
+                        <td><strong>B4</strong> Aspirational Immobile</td>
+                        <td>#9≤1, #10≥4, #8≥3</td>
+                        <td>Minimal investment DESPITE capacity + safety</td>
+                        <td>A5, C1</td>
+                        <td>Rare - verify qualitatively</td>
+                    </tr>
+                    <tr>
+                        <td><strong>C1</strong> Emerging</td>
+                        <td>#1∈[2,3], #9∈[2,3], #10≥4</td>
+                        <td>Moderate scores + favorable environment</td>
+                        <td>B1, A7, C3</td>
+                        <td>Low environmental risk (≥4)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>C2</strong> Consolidation</td>
+                        <td>#1∈[2,3], #9∈[2,3], #10≤2, #8≥2</td>
+                        <td>Moderate scores + environmental stress + capacity</td>
+                        <td>C1, C3, A1, B1</td>
+                        <td>Environmental stress + capacity</td>
+                    </tr>
+                    <tr>
+                        <td><strong>C3</strong> Adaptation Window</td>
+                        <td>Most indicators 2.5-3.5</td>
+                        <td>Balanced mid-range scores = inflection point</td>
+                        <td>C1, C2, B1, A8</td>
+                        <td>No clear dominant driver</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Footer -->
+            <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border-color); text-align: center; color: var(--primary-grey); font-size: 9pt;">
+                <p>Climate Mobility Framework - Classification Logic & Decision Guide</p>
+                <p style="margin-top: 4px;">For technical support and case consultations, refer to full framework documentation</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
